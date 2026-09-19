@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import HeroBackground from './HeroBackground';
 import AnalyticsView from './views/AnalyticsView';
 import ChatView from './views/ChatView';
@@ -26,6 +27,21 @@ const titles: Record<SidebarView, string> = {
  *   - 响应式：移动端 pt-14（让出 56px 顶部窄条），桌面端 lg:pl-60（让出 240px 侧栏）。
  */
 export default function DashboardPage({ activeView }: DashboardPageProps) {
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem('studypal_access_token'),
+  );
+
+  useEffect(() => {
+    const refresh = () =>
+      setToken(localStorage.getItem('studypal_access_token'));
+    window.addEventListener('studypal:auth', refresh);
+    window.addEventListener('storage', refresh);
+    return () => {
+      window.removeEventListener('studypal:auth', refresh);
+      window.removeEventListener('storage', refresh);
+    };
+  }, []);
+
   return (
     <main className="relative min-h-screen w-full overflow-hidden">
       <HeroBackground />
@@ -39,9 +55,7 @@ export default function DashboardPage({ activeView }: DashboardPageProps) {
 
         <div className="px-6 py-8 md:px-10 md:py-10">
           {activeView === 'analytics' && <AnalyticsView />}
-          {activeView === 'chat-advice' && (
-            <ChatView accessToken={localStorage.getItem('studypal_access_token')} />
-          )}
+          {activeView === 'chat-advice' && <ChatView accessToken={token} />}
           {activeView === 'goals' && <GoalsView goals={studyPalData.dailyGoals} />}
         </div>
       </div>

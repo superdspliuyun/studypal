@@ -13,6 +13,18 @@ export default function AnalyticsView() {
   const [days, setDays] = useState<CalendarDay[] | null>(null);
   const [achievements, setAchievements] = useState<Achievement[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reloadTick, setReloadTick] = useState(0);
+
+  useEffect(() => {
+    const onAuth = () => {
+      setDays(null);
+      setAchievements(null);
+      setError(null);
+      setReloadTick((t) => t + 1);
+    };
+    window.addEventListener('studypal:auth', onAuth);
+    return () => window.removeEventListener('studypal:auth', onAuth);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -22,6 +34,7 @@ export default function AnalyticsView() {
         if (cancelled) return;
         setDays(cal);
         setAchievements(ach);
+        setError(null);
       } catch (err) {
         if (!cancelled) setError((err as Error).message);
       }
@@ -29,7 +42,7 @@ export default function AnalyticsView() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reloadTick]);
 
   if (error) {
     return (
