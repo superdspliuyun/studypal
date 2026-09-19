@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <rect width="1600" height="900" fill="var(--color-border, #e2e8f0)" />
+  <text x="800" y="450" text-anchor="middle" dominant-baseline="middle"
+        font-family="system-ui, -apple-system, sans-serif"
+        font-size="48" fill="var(--color-muted, #64748b)">
+    [项目截图占位 1]
+  </text>
+</svg>
