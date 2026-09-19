@@ -1,5 +1,10 @@
 # React + TypeScript + Vite
 
+> **🟢 已上线（2026-09-19）**
+> **前端**：https://superdspliuyun.github.io/studypal/
+> **后端**：https://studypal-backend-ekcp.onrender.com
+> 部署日志：[`evidence/studypal-live.txt`](evidence/studypal-live.txt)
+
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:

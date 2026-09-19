@@ -1,0 +1,48 @@
+StudyPal Live Deployment Log
+=============================
+
+Date:    2026-09-19
+Frontend: https://superdspliuyun.github.io/studypal/  (GitHub Pages, branch: gh-pages)
+Backend:  https://studypal-backend-ekcp.onrender.com  (Render Free web service, branch: test-dev)
+Repo:     https://github.com/superdspliuyun/studypal
+
+Stack
+-----
+Frontend  React 19 + Vite 8 + Tailwind v4 + react-markdown + remark-gfm
+Backend   FastAPI 0.115 + SQLAlchemy 2 + Alembic + python-jose (JWT) + passlib (bcrypt)
+Database  SQLite (ephemeral disk on Render Free tier; data resets on cold start)
+AI        DeepSeek via api.deepseek.com (env DEEPSEEK_API_KEY on Render only)
+
+OpenSpec
+--------
+8 capabilities / 46 requirements:
+  study-pal        user-auth        user-profile
+  ai-chat          chat-storage
+  learning-calendar achievements     app-deploy
+
+3 archived changes (all spec-driven):
+  2026-09-18 user-auth       (JWT auth + profile)
+  2026-09-18 ai-chat          (DeepSeek streaming chat)
+  2026-09-19 analytics-deploy (calendar heatmap + 5 achievements + Render deploy)
+
+Tests
+-----
+pytest 51 passed (24 user-auth + 15 ai-chat + 12 analytics-deploy)
+npm run build  passes; gzipped JS 123 KB
+
+Verified flows (curl from cli)
+-----------------------------
+GET  /healthz                                            -> 200 {"status":"ok"}
+POST /api/auth/register (public)                          -> 201 + JWT pair
+POST /api/auth/login                                      -> 200 + JWT pair
+GET  /api/analytics/calendar?days=30                      -> 200 + length 30 array
+GET  /api/analytics/achievements                          -> 200 + 5 items, stable order
+POST /api/chat/sessions/{id}/messages (SSE)               -> text/event-stream with DeepSeek deltas
+OPTIONS preflight from frontend origin                    -> 200 (after CORS fix)
+
+Open issues / known constraints
+------------------------------
+- Render Free tier = 15 min cold start; SQLite ephemeral
+- Render env CORS_ALLOW_ORIGINS = exact host (no wildcard) for credentialed requests
+- npm run deploy rebuilds without env; use `npx gh-pages -d dist` for VITE_API_BASE-controlled deploys
+- Frontend LoginPanel required to issue JWT before Analytics / Chat are useful
