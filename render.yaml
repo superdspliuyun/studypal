@@ -4,9 +4,10 @@ services:
     runtime: docker
     rootDir: backend
     healthCheckPath: /healthz
+    plan: free
     envVars:
       - key: DATABASE_URL
-        sync: false
+        value: sqlite:///./studypal.db
       - key: JWT_SECRET
         sync: false
       - key: DEEPSEEK_API_KEY
