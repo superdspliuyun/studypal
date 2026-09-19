@@ -4,26 +4,85 @@ schema: spec-driven
 # 在 AI 生成 artifacts 时会展示这里的内容。
 # 添加技术栈、规范、风格指南、领域知识等。
 context: |
-  项目：个人品牌站（Personal Website）
-  技术栈：React 19 + Vite 7 + TypeScript + Tailwind CSS v4
-  部署：GitHub Pages，base path 为 /my-website/
-  设计风格：科技感，动态粒子风，支持亮/暗切换
-  性能：首屏加载 < 2 秒，所有图片使用 lazy loading
+  # 项目定位
+  全栈 AI 学习平台（演进路径：纯前端个人品牌站 → 全栈形态）
+  当前状态：前端品牌站已交付并部署在 GitHub Pages；
+            后端 FastAPI + SQLite 正在按 change 增量引入。
+
+  # 技术栈
+  前端（已上线）：
+    - React 19 + Vite 7 + TypeScript（strict + bundler mode）
+    - Tailwind CSS v4 + @tailwindcss/vite 插件
+    - 构建产物：dist/（已 gitignore），base path: /my-website/
+    - Lint: oxlint；测试基建：暂无
+  后端（即将添加）：
+    - FastAPI（Python 异步框架，自带 OpenAPI 文档）
+    - SQLite（轻量单文件关系库，本地与 CI 易跑）
+  数据契约（计划）：
+    - 前端 -> 后端：JSON over HTTPS / fetch
+    - 类型共享：TypeScript interface 与 Pydantic model 对齐；
+      前端边界用 zod 做运行时校验
+
+  # 样式方案（基于 Explore 结果）
+  - 全部 Tailwind CSS v4 工具类，零内联 style（CLAUDE.md 强约束）
+  - 设计 token 集中于 @theme 块：background / foreground / muted / accent /
+    accent-hover / border / --particle-color
+  - 暗色模式：class-based dark variant
+    （@custom-variant dark (&:where(.dark, .dark *))），
+    驱动源 useTheme hook（localStorage 优先，matchMedia 系统偏好兜底），
+    index.html 内联脚本在 React mount 前同步设置 <html class="dark"> 防闪烁
+  - 图片：全部 loading="lazy"
+  - 组件：TypeScript 函数式组件，文件名 PascalCase
+  - 现有可复用组件（不推倒重来）：
+    Navigation / Hero / HeroBackground / ThemeToggle /
+    Projects / ProjectCard / Contact
+
+  # 路由（基于 Explore 结果）
+  - 前端当前无 client-side router；跳转靠 HTML 锚点
+    （#hero / #projects / #contact）+ CSS scroll-behavior: smooth
+  - 后端 FastAPI 将以 REST 风格提供 /api/* 端点
+    （CORS 需放行前端域名 / 或同源代理）
+  - 全栈阶段若引入"页"层级（课程详情 / 用户中心 / Dashboard 等），
+    应引入 client-side router（如 react-router-dom v7），
+    由对应 change proposal 评估并明示取舍
+
+  # 部署
+  - 用户约束：前后端统一在 GitHub Pages 体系下发布
+  - 技术现实（务必注意）：GitHub Pages 仅托管静态文件，无 server runtime。
+    FastAPI 必须部署在支持 Python runtime 的平台
+    （Render / Fly.io / Railway / Cloud Run / Vercel Python Function 等）；
+    前端通过 VITE_API_BASE 环境变量指向后端域名
+  - CI：前端 vite build 与后端构建解耦，可独立发布；
+    新增后端不应阻塞或破坏现有 npm run build / npm run deploy 流程
+
+  # 强约束
+  - 复用已有组件，不推倒重来（在现有 data/*.ts 数据流基础上扩展）
+  - 新增后端不影响前端构建：即使后端不可达，前端应能降级渲染或显示错误态
+  - 所有现有 section 行为（暗色 / 粒子背景 / 响应式 / SEO meta）保持不变
+  - 性能目标：首屏加载 < 2 秒；后端 API p95 < 200ms（学习平台交互性）
 
 # 各 artifact 的自定义规则（可选）
 rules:
-  proposal:
-    - 必须明确写出 out-of-scope（不做什么）
-    - 必须评估对现有功能的影响
   specs:
-    - 使用 Given/When/Then 格式描述交互行为
-    - 每个 spec 必须包含至少一个边界/异常场景
+    - 所有 API 行为使用 Given/When/Then 格式
+    - 每个 spec 必须包含至少一个错误场景
+    - 每个 requirement 的 scenario 不超过 5 个
+    - 单个 spec 文件不超过 2000 词
+    - 省略理由说明，除非直接影响实现
+    - 使用 RFC 2119 关键词（SHALL / SHOULD / MAY）
   tasks:
-    - 每个任务粒度不超过 30 分钟
-    - 按 Phase 分组，每个 Phase 结束后等待我确认
+    - 单个 task 不超过 2 小时工作量
+    - 相关 task 按 phase 分组
+    - 每个 phase 结束后包含验证步骤
+    - 新建服务前必须先检查是否有可复用的已有服务
+  design:
+    - 包含组件层级图
+    - 文档化所有 API 端点规范
+  proposal:
+    - 必须显式列出不做的事项（out-of-scope / NOT doing 清单）
+    - 高风险变更必须包含回滚方案
 
 # 各操作的指导说明（可选）
-# 与上面的 artifact 规则分开，这里管 apply/archive 流程本身。
 operations:
   apply:
     guidance:

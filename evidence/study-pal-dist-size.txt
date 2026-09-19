@@ -1,0 +1,50 @@
+================================================================
+StudyPal dist 体积对比
+================================================================
+
+Baseline（commit 08eae2d 品牌站 — evidence/build-01-output.txt）
+----------------------------------------------------------------
+dist/index.html                 0.91 kB │ gzip:  0.61 kB
+dist/assets/index-*.css        20.22 kB │ gzip:  4.46 kB
+dist/assets/index-*.js        227.26 kB │ gzip: 71.52 kB
+                                  ------
+total gzip:                              76.59 kB
+modules transformed: 24
+build time: 1.51s
+
+
+StudyPal（最终 — test-dev 分支最新）
+----------------------------------------------------------------
+dist/index.html                 2.79 kB │ gzip:  1.17 kB
+dist/assets/index-*.css        20.86 kB │ gzip:  4.63 kB
+dist/assets/index-*.js        235.64 kB │ gzip: 73.70 kB
+                                  ------
+total gzip:                              79.50 kB
+modules transformed: 30
+build time: 175ms
+
+
+差异
+----------------------------------------------------------------
+                    raw          gzip
+index.html         +1.88 kB     +0.56 kB   (SEO meta 文案更详细)
+index-*.css        +0.64 kB     +0.17 kB   (新增 Tailwind 工具类)
+index-*.js         +8.38 kB     +2.18 kB   (4 个面板组件 + Sidebar + DashboardPage + 4 view)
+                  -------      --------
+total              +10.90 kB    +2.91 kB   (远低于 5 KB gzip 预算)
+
+
+分析
+----------------------------------------------------------------
+- JS 增量 8.38 KB raw / 2.18 KB gzip：包含 11 个新 TSX 文件 +
+  StudyPalData 类型 + Sidebar/DashboardPage 状态管理。gzip 压缩比 ~26%
+  说明代码冗余度高（多为 JSX 模板 + Tailwind 类字符串重复），属正常水平。
+- CSS 增量极小（0.17 KB gzip）：Tailwind v4 + Vite 的 JIT 模式按需生成，
+  新组件引入的工具类大多已在 baseline 出现的工具类集中（grid / flex /
+  padding / text-*），新增量仅为少量未出现的 accent/15、accent/20 等。
+- index.html 增量主要来自 SEO description 文案从 ~30 字扩展到 ~70 字
+  （StudyPal Dashboard 描述）。
+- 删除旧组件后 CSS 从 26.94 KB 降至 20.86 KB（-6.08 KB raw / -0.87 KB
+  gzip），Tailwind tree-shaking 验证通过，无遗漏的旧 class。
+
+================================================================

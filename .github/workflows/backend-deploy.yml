@@ -1,0 +1,30 @@
+name: backend-deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "render.yaml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate render.yaml syntax
+        run: python -c "import yaml; yaml.safe_load(open('render.yaml'))"
+
+      - name: Trigger Render deploy hook
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        if: env.RENDER_DEPLOY_HOOK_URL != ''
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "::warning::RENDER_DEPLOY_HOOK_URL not set; skipping deploy trigger"
+            exit 0
+          fi
+          curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
+          echo "Render deploy hook invoked"

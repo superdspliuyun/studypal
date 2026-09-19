@@ -1,0 +1,129 @@
+================================================================
+StudyPal Phase 3 — 终态快照 + 三维验证
+Change: study-pal
+Date: 2026-09-18
+Branch: test-dev
+Status: 31/31 tasks complete
+================================================================
+
+(1) src/ 最终结构
+----------------------------------------------------------------
+src/App.tsx                                    (顶层组合)
+src/main.tsx                                   (React 入口，未变)
+src/index.css                                  (Tailwind v4，未变)
+src/assets/                                    (构建资源，未变)
+src/data/studyPal.ts                           (mock 数据 + 类型，140 行)
+src/hooks/useTheme.ts                          (主题 hook，未变)
+src/components/
+  HeroBackground.tsx                           (Canvas 粒子，未变)
+  ThemeToggle.tsx                              (主题按钮，未变)
+  Sidebar.tsx                                  (新增，~140 行)
+  DashboardPage.tsx                            (新增，~60 行)
+  StatsCards.tsx                               (新增，~60 行)
+  DailyGoals.tsx                               (新增，~85 行)
+  AISuggestionPanel.tsx                        (新增，~55 行)
+  TrendChart.tsx                               (新增，~135 行)
+  views/
+    DashboardView.tsx                          (新增)
+    GoalsView.tsx                              (新增)
+    InsightsView.tsx                           (新增)
+    SettingsView.tsx                           (新增)
+
+
+(2) 删除的旧组件文件
+----------------------------------------------------------------
+src/components/Navigation.tsx
+src/components/Hero.tsx
+src/components/Projects.tsx
+src/components/ProjectCard.tsx
+src/components/Contact.tsx
+src/data/profile.ts
+src/data/projects.ts
+
+
+(3) Build / Lint 终态
+----------------------------------------------------------------
+npm run build: 通过
+  - 30 modules transformed
+  - built in 175ms
+  - exit code 0
+  - dist/index.html                   2.79 kB │ gzip:  1.17 kB
+  - dist/assets/index-*.css          20.86 kB │ gzip:  4.63 kB
+  - dist/assets/index-*.js          235.64 kB │ gzip: 73.70 kB
+
+npm run lint (oxlint): 通过
+  - 无输出 = 无错误
+  - exit code 0
+
+详细 dist 大小对比见 evidence/study-pal-dist-size.txt
+
+
+(4) 三维验证
+----------------------------------------------------------------
+
+[完整性] 所有 task 完成、所有 requirement 有代码实现
+  tasks.md: 31/31 已勾选
+  spec 8 个 Requirement 对应实现：
+    R1 Sidebar 导航           → src/components/Sidebar.tsx ✓
+    R2 数据统计卡片            → src/components/StatsCards.tsx ✓
+    R3 每日目标清单            → src/components/DailyGoals.tsx ✓
+    R4 AI 建议学习面板         → src/components/AISuggestionPanel.tsx ✓
+    R5 周/月趋势图             → src/components/TrendChart.tsx ✓
+    R6 主题与 token 继承       → 复用 useTheme / index.css（零修改） ✓
+    R7 响应式布局              → Sidebar + DashboardPage lg:*/lg:hidden ✓
+    R8 mock 数据结构稳定性     → src/data/studyPal.ts 导出 StudyPalData ✓
+
+[正确性] 匹配 spec 规格意图 + 处理边界
+  - StatsCards: stats={} 时每张卡显示 [数据待接入]，无报错
+  - DailyGoals: 空数组显示「今日暂无目标」，不渲染空 <ul>
+  - AISuggestionPanel: 空数组显示「[AI 占位] 暂无建议」
+  - TrendChart: 周/月任一为空数组显示「暂无数据」，不渲染空 <svg>
+  - 主题继承: useTheme 复用，localStorage SecurityError 兜底（既有行为）
+  - 响应式: ≥1024px 显示完整 Sidebar，<1024px 折叠为汉堡抽屉
+
+[一致性] design.md 技术决策 + 命名规范
+  D1 Sidebar 新建 vs Navigation 改造     → ✓ 新建 Sidebar.tsx，旧 Navigation.tsx 已删
+  D2 纯手写 SVG（不引入 chart 库）         → ✓ TrendChart.tsx 全 JSX <svg>
+  D3 view 用 useState（不引入 router）      → ✓ App.tsx 顶层 useState<SidebarView>
+  D4 <1024px 折叠为汉堡菜单                → ✓ Sidebar.tsx dual-mode 实现
+  D5 mock 数据放 studyPal.ts + 类型贴近 API → ✓ 6 个 type，camelCase，命名贴近
+  D6 HeroBackground 作为主区域装饰         → ✓ DashboardPage 主区域最底层 -z-10
+
+  命名一致性检查：
+    - 文件名: 全部 PascalCase ✓
+    - 类型名: SidebarView, StudyPalData, StudyPalStats, StudyPalDailyGoal,
+              StudyPalAiSuggestion, StudyPalTrendPoint 全部 PascalCase ✓
+    - 变量名: activeView, drawerOpen, allDone 全部 camelCase ✓
+    - 函数名: formatMinutes, handleSelect, toggle, readStoredTheme 全部 camelCase ✓
+    - Props 名: activeView, onChangeView, stats, goals, suggestions, weekly, monthly ✓
+    - kebab-case 不适用（无 URL/API 端点）
+    - snake_case 不适用（无 DB 表名）
+
+  Spec → Code 映射：spec.md 22 个 Scenario 全部有对应代码路径：
+    - WHEN/THEN 触发的 UI 状态: 全部在对应组件的 JSX 中实现
+    - 错误场景（数据缺失 / 空数组 / localStorage 异常）全部有显式分支
+
+
+(5) 复用检查（task 27-31）
+----------------------------------------------------------------
+[27] Sidebar.tsx 复用核对          ✓ Navigation.tsx 已删，无重叠
+[28] StatsCards.tsx 重复实现核对   ✓ 现有 grep 命中仅为 DashboardView 引用
+[29] DailyGoals.tsx 重复实现核对   ✓ 现有 grep 命中均为 DashboardPage/Sidebar 的合法引用
+[30] AISuggestionPanel.tsx 重复实现核对 ✓ 现有 grep 命中均为 DashboardPage/InsightsView 引用
+[31] TrendChart.tsx 重复实现核对   ✓ 其他 <svg> 用途为图标（hamburger/sun/moon），非数据可视化
+
+
+(6) tasks.md 最终状态
+----------------------------------------------------------------
+31/31 tasks 已勾选完成（详见 openspec/changes/study-pal/tasks.md）
+
+
+(7) Phase 1/2/3 各阶段验证产物
+----------------------------------------------------------------
+evidence/study-pal-phase-0.txt       Phase 0 验证（mock 数据 + SEO）
+evidence/study-pal-phase-1.txt       （本文件即合并 1.V 验证）
+evidence/study-pal-phase-2.txt       （本文件即合并 2.V 验证）
+evidence/study-pal-phase-3.txt       本文件
+evidence/study-pal-dist-size.txt     dist 体积对比表
+
+================================================================

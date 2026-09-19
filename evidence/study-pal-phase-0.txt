@@ -1,0 +1,89 @@
+================================================================
+StudyPal Phase 0 — Evidence Snapshot
+Change: study-pal
+Phase: 0 — 基础设施准备（mock 数据 + SEO meta）
+Date: 2026-09-18
+Branch: test-dev
+================================================================
+
+(1) mock 数据 5 个字段示例值
+----------------------------------------------------------------
+文件: src/data/studyPal.ts
+类型: StudyPalData（导出）
+
+  stats:
+    totalLearningMinutes: 145
+    completedCourses:     8
+    streakDays:           12
+
+  dailyGoals:  3 项
+    [goal-1] 完成 React 19 服务端组件教程         (45 min)
+    [goal-2] 复习 useState 状态提升               (20 min)
+    [goal-3] 阅读 Tailwind v4 changelog            (15 min)
+
+  aiSuggestions:  3 项（**全部为 mock，非真实 AI 生成**）
+    [ai-1] 复习 React Server Components           (30 min)
+    [ai-2] 完成 FastAPI 依赖注入章节              (60 min)
+    [ai-3] TypeScript 严格模式实战                 (40 min)
+
+  weeklyTrend:  7 个点 (09-12 ~ 09-18)
+    minutes: 45, 60, 30, 90, 120, 75, 145
+    max:     145
+
+  monthlyTrend:  30 个点 (08-20 ~ 09-18)
+    minutes 跨度: 0 ~ 145
+    含 1 个 0 值日 (08-25，对应 spec 错误场景兜底验证可改此处)
+
+
+(2) Build 产物大小（npm run build）
+----------------------------------------------------------------
+命令: tsc -b && vite build
+结果: 26 modules transformed, built in 201ms, exit code 0
+      (注：studyPal.ts 当前未被任何组件 import，因此未增加新模块；
+       Phase 1 起 Sidebar/DashboardPage 引入后会增加 1-2 个 module)
+
+dist/index.html                   2.79 kB │ gzip:  1.17 kB
+dist/assets/index-DvcL2FcI.css   22.66 kB │ gzip:  4.87 kB
+dist/assets/index-DD8fhUOB.js   231.75 kB │ gzip: 72.92 kB
+
+tsc 严格模式编译: 通过，无报错
+
+
+(3) <head> 关键 meta 内容（dist/index.html 渲染后）
+----------------------------------------------------------------
+<title>StudyPal — [Your Name] 的学习助手</title>
+<meta name="description" content="[Your Name] 的个人学习 Dashboard：每日目标清单、AI 学习建议、周/月学习趋势可视化（占位字符串由维护者替换，目标是 50–160 字符之间）" />
+<meta name="author" content="[Your Name]" />
+<link rel="canonical" href="https://[username].github.io/my-website/" />
+<meta property="og:title" content="StudyPal — [Your Name] 的学习助手" />
+<meta property="og:description" content="[Your Name] 的个人学习 Dashboard：每日目标清单、AI 学习建议、周/月学习趋势可视化（占位字符串由维护者替换，目标是 50–160 字符之间）" />
+<meta property="og:site_name" content="StudyPal — [Your Name]" />
+<meta property="og:locale" content="zh_CN" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="StudyPal — [Your Name] 的学习助手" />
+<meta name="twitter:description" content="[Your Name] 的个人学习 Dashboard：每日目标清单、AI 学习建议、周/月学习趋势可视化（占位字符串由维护者替换，目标是 50–160 字符之间）" />
+
+
+(4) Phase 0 完成情况
+----------------------------------------------------------------
+[x] 0.1 src/data/studyPal.ts            已创建（140 行，导出 6 个 type + 1 个 const）
+[x] 0.2 index.html SEO meta             已更新（title / description / og / twitter / canonical）
+[x] 0.V Phase 0 验证                    本文件即产出
+
+
+(5) 未触动项（确认留待后续 Phase）
+----------------------------------------------------------------
+- src/App.tsx 仍渲染品牌站四段（Navigation/Hero/Projects/Contact）
+- src/data/{profile,projects}.ts 仍被引用
+- src/components/{Navigation,Hero,Projects,ProjectCard,Contact}.tsx 仍被引用
+- index.html 顶部注释仍引用 profile.ts（Phase 3 收尾时统一清理）
+
+
+(6) Review 等待项
+----------------------------------------------------------------
+请 review 以下两点后告知是否进入 Phase 1：
+  A. mock 数据形态是否符合预期（stats 数值、3 个 goals / 3 个 AI suggestions / 7+30 个 trend 点）
+  B. SEO meta 文案是否合适（StudyPal 命名 + 占位符保留）
+
+确认 OK 后回复"继续 Phase 1"或"开始 1.1"。
+================================================================

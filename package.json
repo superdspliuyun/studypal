@@ -9,12 +9,18 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "backend:install": "cd backend && pip install -r requirements.txt",
+    "backend:migrate": "cd backend && alembic upgrade head",
+    "backend:test": "cd backend && pytest",
+    "backend:run": "cd backend && uvicorn app.main:app --reload --port 8000"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
