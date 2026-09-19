@@ -13,7 +13,7 @@ services:
       - key: DEEPSEEK_API_KEY
         sync: false
       - key: CORS_ALLOW_ORIGINS
-        value: "https://*.github.io,http://localhost:5173"
+        value: "https://superdspliuyun.github.io,http://localhost:5173"
       - key: ENV
         value: prod
       - key: DEEPSEEK_BASE_URL
